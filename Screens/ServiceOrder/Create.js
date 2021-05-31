@@ -5,7 +5,8 @@ import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import * as ImagePicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions';
+
+import {Camera} from 'expo-camera';
 import {connect} from 'react-redux';
 import {addServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
 import {
@@ -59,7 +60,10 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
   };
 
   const takePhoto = async () => {
-    const {granted} = await Permissions.askAsync(Permissions.CAMERA);
+    const {granted} = await Camera.requestPermissionsAsync();
+    console.log(granted);
+
+    /*
     if (granted) {
       let data = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -71,6 +75,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
     } else {
       console.log('no permission');
     }
+    */
   };
   useEffect(() => {
     getEmployee();

@@ -43,7 +43,7 @@ export default function MainNavigation({navigation}) {
             name="Home"
             component={Home}
             options={{
-              headerRight: () => (
+              headerLeft: () => (
                 <Menu
                   visible={visible}
                   statusBarHeight={48}

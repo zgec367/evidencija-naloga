@@ -24,7 +24,6 @@ import {
   TAKE_PHOTO_FAILURE,
   PRINT_SERVICE_ORDER_REQUEST,
   PRINT_SERVICE_ORDER_SUCCESS,
-  FPRINT_SERVICE_ORDER_FAILURE,
   PRINT_SERVICE_ORDER_FAILURE,
 } from '../ServiceOrder/ServiceOrderTypes';
 
@@ -74,6 +73,29 @@ export const addServiceOrderFailure = (error, submitLoading) => {
   };
 };
 
+export const editServiceOrderRequest = submitLoading => {
+  return {
+    type: EDIT_SERVICE_ORDER_REQUEST,
+    payload: submitLoading,
+  };
+};
+
+export const editServiceOrderSuccess = (data, submitLoading) => {
+  return {
+    type: EDIT_SERVICE_ORDER_SUCCESS,
+    payload: data,
+    submitLoading: submitLoading,
+  };
+};
+
+export const editServiceOrderFailure = (error, submitLoading) => {
+  return {
+    type: EDIT_SERVICE_ORDER_FAILURE,
+    payload: error,
+    submitLoading: submitLoading,
+  };
+};
+
 export const printServiceOrderRequest = loading => {
   return {
     type: PRINT_SERVICE_ORDER_REQUEST,
@@ -92,6 +114,29 @@ export const printServiceOrderSuccess = (data, loading) => {
 export const printServiceOrderFailure = (error, loading) => {
   return {
     type: PRINT_SERVICE_ORDER_FAILURE,
+    payload: error,
+    loading: loading,
+  };
+};
+
+export const takePhotoRequest = loading => {
+  return {
+    type: TAKE_PHOTO_REQUEST,
+    payload: loading,
+  };
+};
+
+export const takePhotoSuccess = (data, loading) => {
+  return {
+    type: TAKE_PHOTO_SUCCESS,
+    payload: data,
+    loading: loading,
+  };
+};
+
+export const takePhotoFailure = (error, loading) => {
+  return {
+    type: TAKE_PHOTO_FAILURE,
     payload: error,
     loading: loading,
   };
@@ -173,5 +218,32 @@ export const fetchInProgressOrder = () => {
         const errorMsg = error.message;
         dispatch(fetchInProgressOrdersFailure(errorMsg, loadingData));
       });
+  };
+};
+
+export const editServiceOrder = serviceOrder => {
+  let loadingData = true;
+  let serviceOrderList = [];
+  return dispatch => {
+    dispatch(loadingData);
+    firestore()
+      .collection('ServiceOrders')
+      .doc(serviceOrder.Id)
+      .update({
+        Customer: {
+          Name: serviceOrder.Customer.Name,
+          PhoneNumber: serviceOrder.Customer.PhoneNumber,
+        },
+        Article: serviceOrder.Article,
+        Description: serviceOrder.Description,
+        WarrantyPeriod: serviceOrder.WarrantyPeriod,
+        EssentialData: serviceOrder.EssentialData,
+        PerformedServicesList: serviceOrder.PerformedServicesList,
+        TotalPrice: serviceOrder.TotalPrice,
+      })
+      .then(snapshot => {
+        console.log('uspjesna izmjena');
+      })
+      .catch(error => console.log(error));
   };
 };
