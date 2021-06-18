@@ -26,6 +26,7 @@ import {
   PRINT_SERVICE_ORDER_SUCCESS,
   PRINT_SERVICE_ORDER_FAILURE,
 } from '../ServiceOrder/ServiceOrderTypes';
+import {string} from 'yup/lib/locale';
 
 export const fetchInProgressOrdersRequest = loadingData => {
   return {
@@ -75,22 +76,23 @@ export const addServiceOrderFailure = (error, submitLoading) => {
 
 export const editServiceOrderRequest = submitLoading => {
   return {
-    type: EDIT_SERVICE_ORDER_REQUEST,
+    type: UPDATE_SERVICE_ORDER_REQUEST,
     payload: submitLoading,
   };
 };
 
-export const editServiceOrderSuccess = (data, submitLoading) => {
+export const editServiceOrderSuccess = (submitLoading, successStatus, data) => {
   return {
-    type: EDIT_SERVICE_ORDER_SUCCESS,
+    type: UPDATE_SERVICE_ORDER_SUCCESS,
     payload: data,
     submitLoading: submitLoading,
+    success: successStatus,
   };
 };
 
 export const editServiceOrderFailure = (error, submitLoading) => {
   return {
-    type: EDIT_SERVICE_ORDER_FAILURE,
+    type: UPDATE_SERVICE_ORDER_FAILURE,
     payload: error,
     submitLoading: submitLoading,
   };
@@ -221,11 +223,10 @@ export const fetchInProgressOrder = () => {
   };
 };
 
-export const editServiceOrder = serviceOrder => {
-  let loadingData = true;
-  let serviceOrderList = [];
+export const editServiceOrder = (serviceOrder, navigation) => {
+  let submitLoading = true;
   return dispatch => {
-    dispatch(loadingData);
+    dispatch(editServiceOrderRequest(submitLoading));
     firestore()
       .collection('ServiceOrders')
       .doc(serviceOrder.Id)
@@ -242,8 +243,19 @@ export const editServiceOrder = serviceOrder => {
         TotalPrice: serviceOrder.TotalPrice,
       })
       .then(snapshot => {
-        console.log('uspjesna izmjena');
+        submitLoading = false;
+        let successStatus = true;
+        console.log(successStatus);
+        dispatch(
+          editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
+        );
+        navigation.goBack();
       })
-      .catch(error => console.log(error));
+
+      .catch(error => {
+        submitLoading = false;
+        dispatch(editServiceOrderFailure(submitLoading));
+        console.log('error je:' + error.message);
+      });
   };
 };

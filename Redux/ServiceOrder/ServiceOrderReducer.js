@@ -66,11 +66,14 @@ const reducer = (state = initialState, action) => {
         submitLoading: action.submitLoading,
       };
     case UPDATE_SERVICE_ORDER_SUCCESS:
-      const {index, serviceOrder} = action;
-      const data = [...state];
-      data[index] = serviceOrder;
-      return data;
-
+      const index = state.data.findIndex(data => data.Id !== action.payload.Id); //finding index of the item
+      const newArray = [...state.data]; //making a new array
+      newArray[index] = action.payload; //changing value in the new array
+      console.log(index);
+      return {
+        ...state, //copying the orignal state
+        data: newArray, //reassingning}
+      };
     case UPDATE_SERVICE_ORDER_REQUEST:
       return {
         ...state,
@@ -82,6 +85,7 @@ const reducer = (state = initialState, action) => {
         errorMsg: action.payload,
         error: true,
         loading: action.loading,
+        successStatus: false,
       };
 
     default:

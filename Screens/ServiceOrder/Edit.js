@@ -10,6 +10,7 @@ import {
   Card,
   IconButton,
   Chip,
+  Snackbar,
 } from 'react-native-paper';
 import {Context} from '../../Components/FirebaseProvider';
 import {editServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
@@ -33,6 +34,8 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   const [essentialData, setEssentialData] = useState(
     route.params.serviceOrder.EssentialData,
   );
+
+  const [visible, setVisible] = useState(false);
 
   const validationSchema = Yup.object().shape({
     PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
@@ -66,9 +69,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
             Article: serviceOrder.Article,
             Description: serviceOrder.Description,
             Received: serviceOrder.Received,
-            PerformedServicesPrice: serviceOrder.PerformedServicesPrice
-              ? serviceOrder.PerformedServicesPrice
-              : '',
+
             TotalPrice: serviceOrder.TotalPrice ? serviceOrder.TotalPrice : '',
             Component: '',
           }}
@@ -78,6 +79,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                 Name: values.Name,
                 PhoneNumber: values.PhoneNumber,
               },
+              ServiceOrderNumber: serviceOrder.serviceOrderNumber,
               Id: serviceOrder.Id,
               Article: values.Article,
               Description: values.Description,
@@ -87,7 +89,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
               TotalPrice: values.TotalPrice,
             };
 
-            editServiceOrder(orderEdit);
+            editServiceOrder(orderEdit, navigation);
           }}>
           {({handleChange, handleSubmit, handleBlur, values, errors}) => (
             <View>
@@ -263,11 +265,11 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
 
                         <TextInput
                           style={{backgroundColor: 'white'}}
-                          onBlur={handleBlur('PerformedServicesPrice')}
-                          onChangeText={handleChange('PerformedServicesPrice')}
+                          onBlur={handleBlur('TotalPrice')}
+                          onChangeText={handleChange('TotalPrice')}
                           label="Cijena usluge"
                           placeholder="Unesite cijenu (HRK)"
-                          value={values.PerformedServicesPrice.toString()}
+                          value={values.TotalPrice}
                         />
                       </View>
 
@@ -329,7 +331,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   );
 }
 const mapStateToProps = state => {
-  console.log(state.serviceOrdersData.submitLoading);
+  console.log(state.serviceOrdersData);
   return {
     serviceOrders: state.serviceOrdersData,
   };
