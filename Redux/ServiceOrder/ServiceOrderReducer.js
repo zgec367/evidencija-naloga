@@ -66,14 +66,23 @@ const reducer = (state = initialState, action) => {
         submitLoading: action.submitLoading,
       };
     case UPDATE_SERVICE_ORDER_SUCCESS:
-      const index = state.data.findIndex(data => data.Id !== action.payload.Id); //finding index of the item
+      /* const index = state.data.findIndex(data => data.Id !== action.payload); //finding index of the item
       const newArray = [...state.data]; //making a new array
       newArray[index] = action.payload; //changing value in the new array
-      console.log(index);
-      return {
+      console.log(action.index);
+*/
+      let quote = action.payload;
+      let quotes = [...state.data]; //clone the current state
+      let index = quotes.findIndex(data => data.Id == quote.Id); //find the index of the quote with the quote id passed
+      if (index !== -1) {
+        quotes[index] = quote;
+      }
+      state = Object.assign({}, state, {data: quotes});
+      return state;
+    /*return {
         ...state, //copying the orignal state
         data: newArray, //reassingning}
-      };
+      };*/
     case UPDATE_SERVICE_ORDER_REQUEST:
       return {
         ...state,

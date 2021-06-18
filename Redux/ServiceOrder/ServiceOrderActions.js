@@ -242,10 +242,15 @@ export const editServiceOrder = (serviceOrder, navigation) => {
         PerformedServicesList: serviceOrder.PerformedServicesList,
         TotalPrice: serviceOrder.TotalPrice,
       })
-      .then(snapshot => {
+      .then(() => {
         submitLoading = false;
         let successStatus = true;
-        console.log(successStatus);
+        serviceOrder = firestore()
+          .collection('ServiceOrders')
+          .doc(serviceOrder.Id)
+          .get();
+
+        console.log(serviceOrder);
         dispatch(
           editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
         );
