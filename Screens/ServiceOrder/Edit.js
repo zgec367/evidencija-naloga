@@ -1,5 +1,5 @@
-import React, {useEffect, useContext, useState} from 'react';
-import {View, ScrollView, Image, TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, ScrollView, Image} from 'react-native';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
 import {
@@ -8,25 +8,17 @@ import {
   TextInput,
   Checkbox,
   Card,
-  IconButton,
   Chip,
-  Snackbar,
 } from 'react-native-paper';
-import {Context} from '../../Components/FirebaseProvider';
 import {editServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
-import {Item} from 'react-native-paper/lib/typescript/components/List/List';
-import {set} from 'react-native-reanimated';
 import {connect} from 'react-redux';
 
 function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   const [loading, setLoading] = useState(false);
-  const [performedServices, setPerformedServices] = useState('');
-  const [performedServicesList, setPerformedServicesList] = useState([]);
-  const [servicePrice, setServicePrice] = useState(null);
-  const [deleteDialog, setDelete] = useState(false);
-  const [serviceOrderNumber, setServiceOrderNumber] = useState(
-    route.params.orderNumber,
+  const [performedServicesList, setPerformedServicesList] = useState(
+    route.params.serviceOrder?.PerformedServicesList,
   );
+
   const [serviceOrder, setServiceOrder] = useState(route.params.serviceOrder);
   const [warrantyPeriod, setWarrantyPeriod] = useState(
     route.params.serviceOrder.WarrantyPeriod,
@@ -34,9 +26,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   const [essentialData, setEssentialData] = useState(
     route.params.serviceOrder.EssentialData,
   );
-
-  const [visible, setVisible] = useState(false);
-
+  console.log(route.params.serviceOrder.PerformedServicesList);
   const validationSchema = Yup.object().shape({
     PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
     Article: Yup.string().required('Ovo je polje obavezno'),
@@ -56,7 +46,9 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+    <ScrollView
+      contentContainerStyle={{alignItems: 'center'}}
+      keyboardShouldPersistTaps="always">
       <View style={{width: '90%'}}>
         <Formik
           validationSchema={validationSchema}
@@ -74,22 +66,19 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
             Component: '',
           }}
           onSubmit={async values => {
-            const orderEdit = {
-              Customer: {
-                Name: values.Name,
-                PhoneNumber: values.PhoneNumber,
-              },
-              ServiceOrderNumber: serviceOrder.serviceOrderNumber,
-              Id: serviceOrder.Id,
-              Article: values.Article,
-              Description: values.Description,
-              WarrantyPeriod: warrantyPeriod,
-              EssentialData: essentialData,
-              PerformedServicesList: performedServicesList,
-              TotalPrice: values.TotalPrice,
+            serviceOrder.Customer = {
+              Name: values.Name,
+              PhoneNumber: values.PhoneNumber,
             };
 
-            editServiceOrder(orderEdit, navigation);
+            serviceOrder.Article = values.Article;
+            serviceOrder.Description = values.Description;
+            serviceOrder.WarrantyPeriod = warrantyPeriod;
+            serviceOrder.EssentialData = essentialData;
+            serviceOrder.PerformedServicesList = performedServicesList;
+            serviceOrder.TotalPrice = values.TotalPrice;
+
+            editServiceOrder(serviceOrder, navigation);
           }}>
           {({handleChange, handleSubmit, handleBlur, values, errors}) => (
             <View>
@@ -232,11 +221,14 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                             <TextInput.Icon
                               icon="plus-circle"
                               color="#072f3d"
-                              size={75}
+                              size={50}
                               onPress={() => {
+                                console.log(values.Component);
                                 if (values.Component.length) {
-                                  performedServicesList.push(values.Component);
-                                  console.log(performedServicesList);
+                                  setPerformedServicesList([
+                                    ...performedServicesList,
+                                    values.Component,
+                                  ]);
                                 }
                                 values.Component = '';
                               }}
@@ -245,31 +237,44 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                           style={{backgroundColor: 'white'}}
                           onBlur={handleBlur('Component')}
                           onChangeText={handleChange('Component')}
-                          label="Utrošeni materijal/usluga"
-                          placeholder="Proizvod/usluga"
+                          label="Utrošeni materijal"
+                          placeholder="Proizvod"
                           value={values.Component}
                         />
-
-                        {performedServicesList.map((item, index) => (
-                          <Chip
-                            key={index}
-                            onClose={() =>
-                              setPerformedServicesList(chips =>
-                                chips.filter(chip => chip !== item),
-                              )
-                            }
-                            onPress={() => console.log('Pressed')}>
-                            {item}
-                          </Chip>
-                        ))}
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            marginTop: 20,
+                          }}>
+                          {performedServicesList.map((item, index) => (
+                            <Chip
+                              style={{backgroundColor: 'white', margin: 5}}
+                              key={index}
+                              onClose={() =>
+                                setPerformedServicesList(chips =>
+                                  chips.filter(chip => chip !== item),
+                                )
+                              }
+                              onPress={() => console.log(item)}>
+                              {item}
+                            </Chip>
+                          ))}
+                        </View>
 
                         <TextInput
-                          style={{backgroundColor: 'white'}}
+                          style={{backgroundColor: 'white', marginTop: 10}}
                           onBlur={handleBlur('TotalPrice')}
                           onChangeText={handleChange('TotalPrice')}
                           label="Cijena usluge"
-                          placeholder="Unesite cijenu (HRK)"
+                          placeholder="Unesite cijenu"
                           value={values.TotalPrice}
+                          left={
+                            <TextInput.Affix
+                              text="HRK"
+                              textStyle={{margin: 5}}
+                            />
+                          }
                         />
                       </View>
 
@@ -331,7 +336,6 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   );
 }
 const mapStateToProps = state => {
-  console.log(state.serviceOrdersData);
   return {
     serviceOrders: state.serviceOrdersData,
   };

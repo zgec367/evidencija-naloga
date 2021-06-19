@@ -245,12 +245,6 @@ export const editServiceOrder = (serviceOrder, navigation) => {
       .then(() => {
         submitLoading = false;
         let successStatus = true;
-        serviceOrder = firestore()
-          .collection('ServiceOrders')
-          .doc(serviceOrder.Id)
-          .get();
-
-        console.log(serviceOrder);
         dispatch(
           editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
         );

@@ -3,10 +3,8 @@ import {View, ScrollView, Image, TouchableOpacity} from 'react-native';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import * as ImagePicker from 'expo-image-picker';
 
-import {Camera} from 'expo-camera';
 import {connect} from 'react-redux';
 import {addServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
 import {
@@ -25,7 +23,7 @@ import moment from 'moment';
 function Create({navigation, route, addServiceOrder, serviceOrders}) {
   const {user, setUser} = useContext(Context);
   const [employee, setEmployee] = useState({});
-
+  const [hasPermission, setHasPermission] = useState(null);
   const [deleteDialog, setDelete] = useState(false);
   const [serviceOrderNumber, setServiceOrderNumber] = useState(
     route.params.orderNumber,
@@ -59,9 +57,16 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
       });
   };
 
-  const takePhoto = async () => {
-    const {granted} = await Camera.requestPermissionsAsync();
-    console.log(granted);
+  const takePhoto = () => {
+    try {
+      const image = ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.5,
+      });
+    } catch (error) {
+      console.log(error);
+    }
 
     /*
     if (granted) {
@@ -234,11 +239,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                   {photo ? (
                     <TouchableOpacity
                       onLongPress={() => setDelete(true)}
-                      onPress={
-                        () => takePhoto()
-
-                        //   navigation.navigate("Camera", { savePhoto })
-                      }
+                      onPress={() => takePhoto()}
                       style={{
                         marginTop: 20,
                         width: '100%',
@@ -310,6 +311,11 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
             </Dialog.Actions>
           </Dialog>
         </Portal>
+        <Camera
+          style={StyleSheet.absoluteFill}
+          device={device}
+          isActive={true}
+        />
       </View>
     </ScrollView>
   );
