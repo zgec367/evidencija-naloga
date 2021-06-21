@@ -4,8 +4,9 @@ import * as Yup from 'yup';
 import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
-
+import {Camera} from 'expo-camera';
 import {connect} from 'react-redux';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {addServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
 import {
   Button,
@@ -57,36 +58,22 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
       });
   };
 
-  const takePhoto = () => {
-    try {
-      const image = ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [16, 9],
-        quality: 0.5,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-
+  const takePhoto = async () => {
+    const permission = await Camera.requestPermissionsAsync();
+    console.log(permission.status);
     /*
-    if (granted) {
-      let data = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.3,
-      });
-      if (!data.cancelled) {
-        setPhoto(data.uri);
-      }
-    } else {
-      console.log('no permission');
-    }
-    */
+    if (status === 'granted') {
+      let pickerResult = await ImagePicker.launchImageLibraryAsync();
+      console.log(pickerResult);
+    }*/
   };
   useEffect(() => {
     getEmployee();
   }, []);
   return (
-    <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+    <ScrollView
+      contentContainerStyle={{alignItems: 'center'}}
+      keyboardShouldPersistTaps={'always'}>
       <View style={{width: '90%'}}>
         <Formik
           validationSchema={validationSchema}
@@ -114,6 +101,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
               Received: employee.Name,
               WarrantyPeriod: warrantyPeriod,
               EssentialData: essentialData,
+              Photo: photo,
               Price: '',
               Done: false,
             };
@@ -258,7 +246,10 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       size={200}
                       color="#87cefa"
                       onPress={
-                        () => takePhoto()
+                        () =>
+                          launchCamera({quality: 0.5}, result => {
+                            result.assets.map(data => setPhoto(data.uri));
+                          })
                         // navigation.navigate("Camera", { savePhoto,                 })
                       }
                     />
@@ -311,11 +302,6 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
             </Dialog.Actions>
           </Dialog>
         </Portal>
-        <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={true}
-        />
       </View>
     </ScrollView>
   );

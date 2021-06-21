@@ -145,6 +145,7 @@ export const takePhotoFailure = (error, loading) => {
 };
 
 export const addServiceOrder = (serviceOrder, navigation) => {
+  console.log('u funckiji' + {...serviceOrder});
   let submitLoading = true;
   return dispatch => {
     dispatch(addServiceOrderRequest(submitLoading));
