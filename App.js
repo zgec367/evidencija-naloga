@@ -4,6 +4,7 @@ import {FirebaseProvider} from './Components/FirebaseProvider';
 import MainNavigation from './Navigation/MainNavigation';
 import store from './Redux/Store';
 import {Provider} from 'react-redux';
+
 const theme = {
   ...DefaultTheme,
   colors: {

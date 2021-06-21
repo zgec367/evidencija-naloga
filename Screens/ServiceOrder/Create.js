@@ -3,8 +3,6 @@ import {View, ScrollView, Image, TouchableOpacity} from 'react-native';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import * as ImagePicker from 'expo-image-picker';
-import {Camera} from 'expo-camera';
 import {connect} from 'react-redux';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {addServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
@@ -60,7 +58,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
 
   const takePhoto = async () => {
     const permission = await Camera.requestPermissionsAsync();
-    console.log(permission.status);
+    console.log('slikano' + permission.status);
     /*
     if (status === 'granted') {
       let pickerResult = await ImagePicker.launchImageLibraryAsync();
@@ -96,13 +94,12 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
               },
               Article: values.Article,
               Description: values.Description,
-              OrderDate: new Date(),
+
               OrderTime: moment(new Date()).format('HH:mm'),
               Received: employee.Name,
               WarrantyPeriod: warrantyPeriod,
               EssentialData: essentialData,
               Photo: photo,
-              Price: '',
               Done: false,
             };
 
@@ -235,7 +232,9 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                         alignSelf: 'center',
                       }}>
                       <Image
-                        style={{width: '100%', height: '100%'}}
+                        style={{
+                          resizeMode: 'contain',
+                        }}
                         source={{uri: photo}}
                       />
                     </TouchableOpacity>
@@ -248,6 +247,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       onPress={
                         () =>
                           launchCamera({quality: 0.5}, result => {
+                            console.log('kamera pokrenuta');
                             result.assets.map(data => setPhoto(data.uri));
                           })
                         // navigation.navigate("Camera", { savePhoto,                 })

@@ -16,7 +16,9 @@ import {connect} from 'react-redux';
 function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   const [loading, setLoading] = useState(false);
   const [performedServicesList, setPerformedServicesList] = useState(
-    route.params.serviceOrder?.PerformedServicesList,
+    route.params.serviceOrder.PerformedServicesList
+      ? route.params.serviceOrder.PerformedServicesList
+      : [],
   );
 
   const [serviceOrder, setServiceOrder] = useState(route.params.serviceOrder);
@@ -228,6 +230,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                                   setPerformedServicesList([
                                     ...performedServicesList,
                                     values.Component,
+                                    console.log("je li izvrsena usluga ")
                                   ]);
                                 }
                                 values.Component = '';

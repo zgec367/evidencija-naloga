@@ -12,7 +12,8 @@ import Details from '../Screens/ServiceOrder/Details';
 import PhotoPreview from '../Screens/ServiceOrder/PhotoPreview';
 import Edit from '../Screens/ServiceOrder/Edit';
 import StartLogo from '../Screens/StartLogo';
-export default function MainNavigation({navigation}) {
+import DoneOrders from '../Screens/ServiceOrder/DoneOrders';
+export default function MainNavigation() {
   const Stack = createStackNavigator();
   const {logOut} = useContext(Context);
   const {user, setUser} = useContext(Context);
@@ -42,7 +43,7 @@ export default function MainNavigation({navigation}) {
           <Stack.Screen
             name="Home"
             component={Home}
-            options={{
+            options={({navigation}) => ({
               headerLeft: () => (
                 <Menu
                   visible={visible}
@@ -84,7 +85,10 @@ export default function MainNavigation({navigation}) {
                     </Button>
                     <Button
                       uppercase={false}
-                      onPress={() => console.log('opa')}
+                      onPress={() => {
+                        setVisible(false);
+                        navigation.navigate('FinishedOrders');
+                      }}
                       style={{marginTop: 20}}
                       labelStyle={{
                         color: 'white',
@@ -116,7 +120,7 @@ export default function MainNavigation({navigation}) {
               headerStyle: {
                 backgroundColor: '#87cefa',
               },
-            }}
+            })}
           />
         ) : (
           <Stack.Screen
@@ -182,6 +186,20 @@ export default function MainNavigation({navigation}) {
           component={PhotoPreview}
           options={{
             title: 'Prikaz slike',
+            headerTintColor: 'white',
+            headerTitleStyle: {
+              fontSize: 25,
+            },
+            headerStyle: {
+              backgroundColor: '#87cefa',
+            },
+          }}
+        />
+        <Stack.Screen
+          name="FinishedOrders"
+          component={DoneOrders}
+          options={{
+            title: 'Izvšeni nalozi',
             headerTintColor: 'white',
             headerTitleStyle: {
               fontSize: 25,

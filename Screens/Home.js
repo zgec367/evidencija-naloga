@@ -100,7 +100,7 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.Id}
           style={{width: '100%'}}
-          data={serviceOrders.data}
+          data={serviceOrders.data.filter(item => item.Done == false)}
           renderItem={({item}) => (
             <Card
               onPress={() =>
@@ -182,6 +182,8 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
   );
 }
 const mapStateToProps = state => {
+  console.log(state.serviceOrdersData.data);
+
   return {
     serviceOrders: state.serviceOrdersData,
   };

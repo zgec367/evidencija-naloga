@@ -1,4 +1,5 @@
 import firestore, {firebase} from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import {createContext} from 'react';
 import moment from 'moment';
 
@@ -145,7 +146,7 @@ export const takePhotoFailure = (error, loading) => {
 };
 
 export const addServiceOrder = (serviceOrder, navigation) => {
-  console.log('u funckiji' + {...serviceOrder});
+  console.log('u funckiji' + serviceOrder.Id);
   let submitLoading = true;
   return dispatch => {
     dispatch(addServiceOrderRequest(submitLoading));
@@ -154,12 +155,15 @@ export const addServiceOrder = (serviceOrder, navigation) => {
       .add(serviceOrder)
       .then(snapshot => {
         serviceOrder.Id = snapshot.id;
+        serviceOrder.OrderDate = firebase.firestore.Timestamp.fromDate(
+          new Date(),
+        );
+
         if (serviceOrder.Photo) {
+          console.log(serviceOrder.Id);
           const fileExtension = serviceOrder.Photo.split('.').pop();
           const fileName = `${snapshot.id}.${fileExtension}`;
-          const storageRef = firebase
-            .storage()
-            .ref(`serviceorders/images/${fileName}`);
+          const storageRef = storage().ref(`serviceorders/images/${fileName}`);
           storageRef.putFile(serviceOrder.Photo).on(
             firebase.storage.TaskEvent.STATE_CHANGED,
             snapshot => {
@@ -180,6 +184,7 @@ export const addServiceOrder = (serviceOrder, navigation) => {
                 serviceOrder.Photo = downloadUrl;
                 snapshot.set(serviceOrder);
                 dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
+                console.log('dodano.........');
                 navigation.goBack();
               });
             },
@@ -188,6 +193,7 @@ export const addServiceOrder = (serviceOrder, navigation) => {
           submitLoading = false;
           snapshot.set(serviceOrder);
           dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
+          console.log('dodano...' + serviceOrder);
           navigation.goBack();
         }
       })
@@ -195,6 +201,7 @@ export const addServiceOrder = (serviceOrder, navigation) => {
         submitLoading = false;
         const errorMsg = error.message;
         dispatch(addServiceOrderFailure(errorMsg, submitLoading));
+        console.log('error je:' + errorMsg);
       });
   };
 };
@@ -206,11 +213,14 @@ export const fetchInProgressOrder = () => {
     dispatch(fetchInProgressOrdersRequest(loadingData));
     firestore()
       .collection('ServiceOrders')
-      .orderBy('OrderDate', 'desc')
       .get()
       .then(querySnapshot => {
         querySnapshot.docs.map(e => {
-          serviceOrderList.push(e._data);
+        
+            serviceOrderList.push(e._data);
+          
+
+          console.log(e._data.Done);
         });
         loadingData = false;
         const data = serviceOrderList;
@@ -220,6 +230,7 @@ export const fetchInProgressOrder = () => {
         loadingData = false;
         const errorMsg = error.message;
         dispatch(fetchInProgressOrdersFailure(errorMsg, loadingData));
+        console.log('erorrrrrrrrr' + errorMsg);
       });
   };
 };
@@ -249,6 +260,7 @@ export const editServiceOrder = (serviceOrder, navigation) => {
         dispatch(
           editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
         );
+        console.log('editServiceOrder, dodano...');
         navigation.goBack();
       })
 
