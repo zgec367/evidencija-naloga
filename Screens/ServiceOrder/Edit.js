@@ -15,6 +15,8 @@ import {connect} from 'react-redux';
 
 function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   const [loading, setLoading] = useState(false);
+  const [finishOrder, setFinishedOrder] = useState(false);
+
   const [performedServicesList, setPerformedServicesList] = useState(
     route.params.serviceOrder.PerformedServicesList
       ? route.params.serviceOrder.PerformedServicesList
@@ -37,16 +39,6 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
     Description: Yup.string().required('Ovo je polje obavezno'),
   });
 
-  const savePhoto = photoUri => {
-    setPhoto(photoUri);
-  };
-
-  const removeChip = chipToDelete => {
-    setPerformedServicesList(chips =>
-      chips.filter(chip => chip !== chipToDelete),
-    );
-  };
-
   return (
     <ScrollView
       contentContainerStyle={{alignItems: 'center'}}
@@ -63,7 +55,6 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
             Article: serviceOrder.Article,
             Description: serviceOrder.Description,
             Received: serviceOrder.Received,
-
             TotalPrice: serviceOrder.TotalPrice ? serviceOrder.TotalPrice : '',
             Component: '',
           }}
@@ -79,6 +70,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
             serviceOrder.EssentialData = essentialData;
             serviceOrder.PerformedServicesList = performedServicesList;
             serviceOrder.TotalPrice = values.TotalPrice;
+            serviceOrder.Done = finishOrder ? true : serviceOrder.Done;
 
             editServiceOrder(serviceOrder, navigation);
           }}>
@@ -230,7 +222,7 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                                   setPerformedServicesList([
                                     ...performedServicesList,
                                     values.Component,
-                                    console.log("je li izvrsena usluga ")
+                                    console.log('je li izvrsena usluga '),
                                   ]);
                                 }
                                 values.Component = '';
@@ -309,7 +301,16 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                         fontSize: 15,
                       }}
                       mode="contained"
-                      onPress={handleSubmit}>
+                      onPress={() => {
+                        if (values.TotalPrice && performedServicesList.length) {
+                          setFinishedOrder(true);
+                          handleSubmit();
+                        } else {
+                          alert(
+                            'Niste unijeli cijenu i usluge servisnog naloga',
+                          );
+                        }
+                      }}>
                       Završi nalog
                     </Button>
                     <Button

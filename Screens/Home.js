@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import RNPrint from 'react-native-print';
-import {View, FlatList, Text, ActivityIndicator} from 'react-native';
+import {View, FlatList, Text, ActivityIndicator, Image} from 'react-native';
 import {FAB, Card, IconButton} from 'react-native-paper';
 import moment from 'moment';
 import {connect} from 'react-redux';
@@ -147,10 +147,21 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
                 </Text>
               </Card.Content>
               {item.Photo && (
-                <Card.Cover
-                  source={{uri: item.Photo}}
-                  style={{resizeMode: 'contain'}}
-                />
+                <View
+                  style={{
+                    width: '90%',
+                    height: 200,
+                    alignSelf: 'center',
+                    margin: 10,
+                  }}>
+                  <Image
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                    source={{uri: item.Photo}}
+                  />
+                </View>
               )}
             </Card>
           )}

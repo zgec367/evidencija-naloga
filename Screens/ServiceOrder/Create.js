@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from 'react-redux';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {launchCamera} from 'react-native-image-picker';
 import {addServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
 import {
   Button,
@@ -16,7 +16,7 @@ import {
   Portal,
 } from 'react-native-paper';
 import {Context} from '../../Components/FirebaseProvider';
-import firestore, {firebase} from '@react-native-firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 
 function Create({navigation, route, addServiceOrder, serviceOrders}) {
@@ -29,7 +29,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
   );
   const [warrantyPeriod, setWarrantyPeriod] = useState(false);
   const [essentialData, setEssentialData] = useState(false);
-  const [photo, setPhoto] = useState(route.params?.photoUri);
+  const [photo, setPhoto] = useState('');
   const phoneRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g;
   const validationSchema = Yup.object().shape({
     PhoneNumber: Yup.string()
@@ -224,15 +224,21 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                   {photo ? (
                     <TouchableOpacity
                       onLongPress={() => setDelete(true)}
-                      onPress={() => takePhoto()}
+                      onPress={() =>
+                        launchCamera({quality: 0.5}, result => {
+                          console.log('kamera pokrenuta');
+                          result.assets.map(data => setPhoto(data.uri));
+                          console.log(photo);
+                        })
+                      }
                       style={{
                         marginTop: 20,
-                        width: '100%',
-                        height: 200,
-                        alignSelf: 'center',
+                        height: 300,
                       }}>
                       <Image
                         style={{
+                          width: '100%',
+                          height: '100%',
                           resizeMode: 'contain',
                         }}
                         source={{uri: photo}}
@@ -244,13 +250,11 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       name="photo"
                       size={200}
                       color="#87cefa"
-                      onPress={
-                        () =>
-                          launchCamera({quality: 0.5}, result => {
-                            console.log('kamera pokrenuta');
-                            result.assets.map(data => setPhoto(data.uri));
-                          })
-                        // navigation.navigate("Camera", { savePhoto,                 })
+                      onPress={() =>
+                        launchCamera({quality: 0.5}, result => {
+                          console.log('kamera pokrenuta');
+                          result.assets.map(data => setPhoto(data.uri));
+                        })
                       }
                     />
                   )}
