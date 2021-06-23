@@ -1,12 +1,12 @@
-import React from "react";
-import { View, Image } from "react-native";
+import React from 'react';
+import {View, Image} from 'react-native';
 
-export default function PhotoPreview({ navigation, route }) {
+export default function PhotoPreview({navigation, route}) {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{height: '100%'}}>
       <Image
-        style={{ flex: 1, resizeMode: "cover" }}
-        source={{ uri: route.params.photo }}
+        style={{height: '100%', width: '100%', resizeMode: 'contain'}}
+        source={{uri: route.params.photo}}
       />
     </View>
   );

@@ -12,6 +12,22 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
       fetchInProgressOrder();
     }
   }, []);
+
+  const RightContent = props => (
+    <Text {...props} style={{alignSelf: 'flex-end'}}>
+      <IconButton
+        icon="pencil"
+        color="#072f3d"
+        onPress={() => navigation.navigate('Edit', {serviceOrder: item})}
+      />
+      <IconButton
+        icon="printer-pos"
+        color="#072f3d"
+        onPress={() => printPDF(item)}
+      />
+    </Text>
+  );
+
   const printPDF = async item => {
     await RNPrint.print({
       html: `
@@ -122,25 +138,15 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
                   '/' +
                   moment(item.OrderDate).year()
                 }
+                right={RightContent}
               />
-              <Text style={{alignSelf: 'flex-end'}}>
-                <IconButton
-                  icon="pencil"
-                  color="#072f3d"
-                  onPress={() =>
-                    navigation.navigate('Edit', {serviceOrder: item})
-                  }
-                />
-                <IconButton
-                  icon="printer-pos"
-                  color="#072f3d"
-                  onPress={() => printPDF(item)}
-                />
-              </Text>
 
               <Card.Content>
                 <Text style={{color: '#072f3d', fontSize: 15}}>
                   {item.Article + ' - ' + item.Description}
+                </Text>
+                <Text style={{color: '#072f3d', fontSize: 15}}>
+                  {'\nKupac: ' + item.Customer.Name}
                 </Text>
                 <Text style={{color: '#072f3d', fontSize: 15}}>
                   {'Kontakt: ' + item.Customer.PhoneNumber}

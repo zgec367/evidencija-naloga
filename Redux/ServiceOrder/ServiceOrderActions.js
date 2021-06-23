@@ -184,7 +184,7 @@ export const addServiceOrder = (serviceOrder, navigation) => {
                 serviceOrder.Photo = downloadUrl;
                 snapshot.set(serviceOrder);
                 dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
-                console.log('dodano.........');
+                
                 navigation.goBack();
               });
             },
@@ -229,8 +229,7 @@ export const fetchInProgressOrder = () => {
       .catch(error => {
         loadingData = false;
         const errorMsg = error.message;
-        dispatch(fetchInProgressOrdersFailure(errorMsg, loadingData));
-        console.log('erorrrrrrrrr' + errorMsg);
+        dispatch(fetchInProgressOrdersFailure(errorMsg, loadingData)); 
       });
   };
 };
@@ -260,14 +259,14 @@ export const editServiceOrder = (serviceOrder, navigation) => {
         dispatch(
           editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
         );
-        console.log('editServiceOrder, dodano...');
+
         navigation.goBack();
       })
 
       .catch(error => {
         submitLoading = false;
         dispatch(editServiceOrderFailure(submitLoading));
-        console.log('error je:' + error.message);
+        
       });
   };
 };

@@ -225,11 +225,19 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                     <TouchableOpacity
                       onLongPress={() => setDelete(true)}
                       onPress={() =>
-                        launchCamera({quality: 0.5}, result => {
-                          console.log('kamera pokrenuta');
-                          result.assets.map(data => setPhoto(data.uri));
-                          console.log(photo);
-                        })
+                        launchCamera(
+                          {
+                            quality: 0.2,
+                            maxHeight: 250,
+                            maxWidth: 350,
+                            includeBase64: true,
+                          },
+                          result => {
+                            console.log('kamera pokrenuta');
+                            result.assets.map(data => setPhoto(data.uri));
+                            console.log(photo);
+                          },
+                        )
                       }
                       style={{
                         marginTop: 20,
@@ -251,7 +259,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       size={200}
                       color="#87cefa"
                       onPress={() =>
-                        launchCamera({quality: 0.5}, result => {
+                        launchCamera({quality: 0.2}, result => {
                           console.log('kamera pokrenuta');
                           result.assets.map(data => setPhoto(data.uri));
                         })

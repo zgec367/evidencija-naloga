@@ -30,7 +30,9 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
   const [essentialData, setEssentialData] = useState(
     route.params.serviceOrder.EssentialData,
   );
-  console.log(route.params.serviceOrder.PerformedServicesList);
+  console.log(
+    '33 linija edit..' + route.params.serviceOrder.PerformedServicesList,
+  );
   const validationSchema = Yup.object().shape({
     PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
     Article: Yup.string().required('Ovo je polje obavezno'),
@@ -225,7 +227,6 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                                     console.log('je li izvrsena usluga '),
                                   ]);
                                 }
-                                values.Component = '';
                               }}
                             />
                           }
