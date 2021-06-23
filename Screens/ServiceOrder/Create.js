@@ -30,6 +30,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
   const [warrantyPeriod, setWarrantyPeriod] = useState(false);
   const [essentialData, setEssentialData] = useState(false);
   const [photo, setPhoto] = useState('');
+  const [visible, setVisible] = useState(true);
 
   const validationSchema = Yup.object().shape({
     Article: Yup.string().required('Ovo je polje obavezno'),
@@ -75,7 +76,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
         <Formik
           validationSchema={validationSchema}
           validateOnBlur={false}
-          validateOnChange={true}
+          validateOnChange={false}
           validateOnMount={false}
           initialValues={{
             Name: '',

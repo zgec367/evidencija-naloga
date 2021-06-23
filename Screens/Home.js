@@ -154,7 +154,7 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
                   {'Kontakt: ' + item.Customer.PhoneNumber}
                 </Text>
               </Card.Content>
-              {item.Photo && (
+              {item.Photo ? (
                 <View
                   style={{
                     width: '90%',
@@ -170,7 +170,7 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
                     source={{uri: item.Photo}}
                   />
                 </View>
-              )}
+              ) : null}
             </Card>
           )}
         />

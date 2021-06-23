@@ -1,6 +1,7 @@
 import firestore, {firebase} from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {createContext} from 'react';
+import {ToastAndroid} from 'react-native';
 import moment from 'moment';
 
 export const Context = createContext();
@@ -160,7 +161,6 @@ export const addServiceOrder = (serviceOrder, navigation) => {
         );
 
         if (serviceOrder.Photo) {
-          console.log(serviceOrder.Id);
           const fileExtension = serviceOrder.Photo.split('.').pop();
           const fileName = `${snapshot.id}.${fileExtension}`;
           const storageRef = storage().ref(`serviceorders/images/${fileName}`);
@@ -168,7 +168,6 @@ export const addServiceOrder = (serviceOrder, navigation) => {
             firebase.storage.TaskEvent.STATE_CHANGED,
             snapshot => {
               if (snapshot.state === firebase.storage.TaskState.SUCCESS) {
-                console.log('Success');
               }
             },
             error => {
@@ -180,12 +179,18 @@ export const addServiceOrder = (serviceOrder, navigation) => {
             () => {
               storageRef.getDownloadURL().then(downloadUrl => {
                 submitLoading = false;
-                console.log('file: ' + downloadUrl);
                 serviceOrder.Photo = downloadUrl;
                 snapshot.set(serviceOrder);
                 dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
-                
+
                 navigation.goBack();
+                ToastAndroid.showWithGravityAndOffset(
+                  'Uspješno ste dodali servisni nalog',
+                  ToastAndroid.SHORT,
+                  ToastAndroid.BOTTOM,
+                  0,
+                  100,
+                );
               });
             },
           );
@@ -193,7 +198,6 @@ export const addServiceOrder = (serviceOrder, navigation) => {
           submitLoading = false;
           snapshot.set(serviceOrder);
           dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
-          console.log('dodano...' + serviceOrder);
           navigation.goBack();
         }
       })
@@ -213,12 +217,11 @@ export const fetchInProgressOrder = () => {
     dispatch(fetchInProgressOrdersRequest(loadingData));
     firestore()
       .collection('ServiceOrders')
+      .orderBy('OrderDate', 'desc')
       .get()
       .then(querySnapshot => {
         querySnapshot.docs.map(e => {
-        
-            serviceOrderList.push(e._data);
-          
+          serviceOrderList.push(e._data);
 
           console.log(e._data.Done);
         });
@@ -229,7 +232,7 @@ export const fetchInProgressOrder = () => {
       .catch(error => {
         loadingData = false;
         const errorMsg = error.message;
-        dispatch(fetchInProgressOrdersFailure(errorMsg, loadingData)); 
+        dispatch(fetchInProgressOrdersFailure(errorMsg, loadingData));
       });
   };
 };
@@ -256,6 +259,13 @@ export const editServiceOrder = (serviceOrder, navigation) => {
       .then(() => {
         submitLoading = false;
         let successStatus = true;
+        ToastAndroid.showWithGravityAndOffset(
+          'Uspješno ste ažurirali servisni nalog',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          0,
+          100,
+        );
         dispatch(
           editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
         );
@@ -266,7 +276,6 @@ export const editServiceOrder = (serviceOrder, navigation) => {
       .catch(error => {
         submitLoading = false;
         dispatch(editServiceOrderFailure(submitLoading));
-        
       });
   };
 };

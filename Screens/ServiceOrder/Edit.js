@@ -188,7 +188,7 @@ function Edit({navigation, route, editServiceOrder}) {
                       }}
                     />
                   </View>
-                  {route.params.serviceOrder.Photo && (
+                  {route.params.serviceOrder.Photo ? (
                     <View>
                       <Text
                         style={{
@@ -204,7 +204,7 @@ function Edit({navigation, route, editServiceOrder}) {
                         />
                       </View>
                     </View>
-                  )}
+                  ) : null}
 
                   <Card
                     style={{
