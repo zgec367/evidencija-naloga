@@ -13,21 +13,6 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
     }
   }, []);
 
-  const RightContent = props => (
-    <Text {...props} style={{alignSelf: 'flex-end'}}>
-      <IconButton
-        icon="pencil"
-        color="#072f3d"
-        onPress={() => navigation.navigate('Edit', {serviceOrder: item})}
-      />
-      <IconButton
-        icon="printer-pos"
-        color="#072f3d"
-        onPress={() => printPDF(item)}
-      />
-    </Text>
-  );
-
   const printPDF = async item => {
     await RNPrint.print({
       html: `
@@ -138,7 +123,24 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
                   '/' +
                   moment(item.OrderDate).year()
                 }
-                right={RightContent}
+                right={() => (
+                  <Text style={{alignSelf: 'flex-end'}}>
+                    <IconButton
+                      size={30}
+                      icon="pencil"
+                      color="#072f3d"
+                      onPress={() =>
+                        navigation.navigate('Edit', {serviceOrder: item})
+                      }
+                    />
+                    <IconButton
+                      size={30}
+                      icon="printer-pos"
+                      color="#072f3d"
+                      onPress={() => printPDF(item)}
+                    />
+                  </Text>
+                )}
               />
 
               <Card.Content>

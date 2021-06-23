@@ -30,15 +30,14 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
   const [warrantyPeriod, setWarrantyPeriod] = useState(false);
   const [essentialData, setEssentialData] = useState(false);
   const [photo, setPhoto] = useState('');
-  const phoneRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g;
-  const validationSchema = Yup.object().shape({
-    PhoneNumber: Yup.string()
-      .matches(phoneRegex, 'Neispravan broj')
-      .required('Ovo je polje obavezno'),
 
+  const validationSchema = Yup.object().shape({
     Article: Yup.string().required('Ovo je polje obavezno'),
     Name: Yup.string().required('Ovo je polje obavezno'),
-    PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
+    PhoneNumber: Yup.string()
+      .required('Ovo je polje obavezno')
+      .matches('^[0-9]+$', 'Neispravan broj')
+      .length(10, 'Kontakt broj mora sadržavati 10 brojeva'),
     Description: Yup.string().required('Ovo je polje obavezno'),
   });
 
@@ -76,7 +75,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
         <Formik
           validationSchema={validationSchema}
           validateOnBlur={false}
-          validateOnChange={false}
+          validateOnChange={true}
           validateOnMount={false}
           initialValues={{
             Name: '',
@@ -266,7 +265,6 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       }
                     />
                   )}
-                  {serviceOrders.submitLoading && <Text>loading</Text>}
                   <Button
                     loading={serviceOrders.submitLoading}
                     disabled={serviceOrders.submitLoading}

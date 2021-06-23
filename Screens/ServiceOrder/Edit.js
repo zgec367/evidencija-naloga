@@ -13,7 +13,7 @@ import {
 import {editServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
 import {connect} from 'react-redux';
 
-function Edit({navigation, route, editServiceOrder, serviceOrders}) {
+function Edit({navigation, route, editServiceOrder}) {
   const [loading, setLoading] = useState(false);
   const [finishOrder, setFinishedOrder] = useState(false);
 
@@ -40,6 +40,10 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
     PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
     Description: Yup.string().required('Ovo je polje obavezno'),
   });
+
+  const addChip = value => {
+    setPerformedServicesList([...performedServicesList, value]);
+  };
 
   return (
     <ScrollView
@@ -219,14 +223,10 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
                               color="#072f3d"
                               size={50}
                               onPress={() => {
-                                console.log(values.Component);
                                 if (values.Component.length) {
-                                  setPerformedServicesList([
-                                    ...performedServicesList,
-                                    values.Component,
-                                    console.log('je li izvrsena usluga '),
-                                  ]);
+                                  addChip(values.Component);
                                 }
+                                values.Component = '';
                               }}
                             />
                           }
@@ -340,13 +340,9 @@ function Edit({navigation, route, editServiceOrder, serviceOrders}) {
     </ScrollView>
   );
 }
-const mapStateToProps = state => {
-  return {
-    serviceOrders: state.serviceOrdersData,
-  };
-};
+
 const mapDispatchToProps = {
   editServiceOrder,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Edit);
+export default connect(null, mapDispatchToProps)(Edit);
