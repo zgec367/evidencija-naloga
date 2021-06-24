@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "1012416515760",
+    "firebase_url": "https://evidencijaservisnihnaloga-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "evidencijaservisnihnaloga",
+    "storage_bucket": "evidencijaservisnihnaloga.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012416515760:android:4c234d4b0564af5097b575",
+        "android_client_info": {
+          "package_name": "com.evidencija_naloga"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1012416515760-dkmktej04vhj9dbt0lpmism4k0nsfe49.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp2cOoiDWBsu2GtmtEhArHvvr7TotcMpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1012416515760-dkmktej04vhj9dbt0lpmism4k0nsfe49.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012416515760:android:f2c3dcd3cfb7e96d97b575",
+        "android_client_info": {
+          "package_name": "com.example.evidencija_servisnih_naloga"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1012416515760-dkmktej04vhj9dbt0lpmism4k0nsfe49.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp2cOoiDWBsu2GtmtEhArHvvr7TotcMpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1012416515760-dkmktej04vhj9dbt0lpmism4k0nsfe49.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
