@@ -13,6 +13,8 @@ import {
 const initialState = {
   employees: [],
   employee: {},
+  submitLoading: false,
+  errorMsg: '',
 };
 
 const reducer = (state = initialState, action) => {

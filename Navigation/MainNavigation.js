@@ -6,6 +6,8 @@ import {Dimensions, Text, View} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../Screens/Home';
 import Login from '../Screens/Login';
+import {connect} from 'react-redux';
+
 import {IconButton, Menu, Button} from 'react-native-paper';
 import Create from '../Screens/ServiceOrder/Create';
 import Details from '../Screens/ServiceOrder/Details';
@@ -13,9 +15,9 @@ import PhotoPreview from '../Screens/ServiceOrder/PhotoPreview';
 import Edit from '../Screens/ServiceOrder/Edit';
 import StartLogo from '../Screens/StartLogo';
 import DoneOrders from '../Screens/ServiceOrder/DoneOrders';
-export default function MainNavigation() {
+import {logOut} from '../Redux/Employee/EmployeeActions';
+function MainNavigation({logOut}) {
   const Stack = createStackNavigator();
-  const {logOut} = useContext(Context);
   const {user, setUser} = useContext(Context);
   const [initializing, setInitializing] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -213,3 +215,9 @@ export default function MainNavigation() {
     </NavigationContainer>
   );
 }
+
+const mapDispatchToProps = {
+  logOut,
+};
+
+export default connect(null, mapDispatchToProps)(MainNavigation);

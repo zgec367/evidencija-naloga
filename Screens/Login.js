@@ -1,22 +1,14 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, FlatList, Text, Keyboard, ActivityIndicator} from 'react-native';
-import auth from '@react-native-firebase/auth';
 import {Formik} from 'formik';
-import firestore from '@react-native-firebase/firestore';
 import {List, Modal, TextInput, Button} from 'react-native-paper';
-import {Context} from '../Components/FirebaseProvider';
 import * as Yup from 'yup';
 import {connect} from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import {fetchEmployees, login} from '../Redux/Employee/EmployeeActions';
 function Login({employees, fetchEmployees, login}) {
   const [pickedEmployee, setPickedEmployee] = useState({});
   const [visible, setVisible] = useState(false);
   const [showPassword, setShow] = useState(false);
-  const {user, setUser} = useContext(Context);
-  const [search, setSearch] = useState('');
-
-  const [connection, setConnection] = useState(true);
 
   const SignInSchema = Yup.object().shape({
     password: Yup.string().required('Ovo je polje obavezno'),
@@ -53,23 +45,6 @@ function Login({employees, fetchEmployees, login}) {
         }}>
         Odaberite zaposlenika za prijavu
       </Text>
-      <View style={{width: '70%'}}>
-        <TextInput
-          style={{backgroundColor: 'lightgrey', height: 50, borderRadius: 15}}
-          placeholder="Pretraži zaposlenika"
-          value={search}
-          underlineColor="transparent"
-          selectionColor="#87cefa"
-          theme={{
-            roundness: 15,
-            colors: {
-              primary: 'transparent',
-            },
-          }}
-          onChangeText={text => setSearch(text)}
-          left={<TextInput.Icon name="magnify" size={28} color="grey" />}
-        />
-      </View>
 
       {!employees.loadingData ? (
         <FlatList
@@ -77,7 +52,7 @@ function Login({employees, fetchEmployees, login}) {
           keyExtractor={item => item.Id}
           style={{
             width: '100%',
-            marginTop: 20,
+            marginTop: 10,
             backgroundColor: '#87cefa',
             zIndex: -1,
           }}
@@ -166,9 +141,9 @@ function Login({employees, fetchEmployees, login}) {
                   />
                 }
               />
-              {errors.password && (
+              {employees.errorMsg.includes('[auth/wrong-password]') && (
                 <Text style={{color: 'red', marginLeft: 10}}>
-                  {errors.password}
+                  Netočna lozinka
                 </Text>
               )}
 
@@ -197,6 +172,7 @@ function Login({employees, fetchEmployees, login}) {
   );
 }
 const mapStateToProps = state => {
+  console.log(state.employeesData.submitLoading);
   return {
     employees: state.employeesData,
   };

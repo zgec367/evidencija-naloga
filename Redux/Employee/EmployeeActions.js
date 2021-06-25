@@ -38,6 +38,28 @@ export const LoginFailure = (error, submitLoading) => {
   };
 };
 
+export const logoutRequest = submitLoading => {
+  return {
+    type: EMPLOYEE_LOGOUT_REQUEST,
+    payload: submitLoading,
+  };
+};
+
+export const logoutSuccess = submitLoading => {
+  return {
+    type: EMPLOYEE_LOGOUT_SUCCESS,
+    submitLoading: submitLoading,
+  };
+};
+
+export const logoutFailure = (error, submitLoading) => {
+  return {
+    type: EMPLOYEE_LOGOUT_FAILURE,
+    payload: error,
+    submitLoading: submitLoading,
+  };
+};
+
 export const fetchEmployeesRequest = loadingData => {
   return {
     type: FETCH_EMPLOYEES_REQUEST,
@@ -86,7 +108,26 @@ export const login = (email, password) => {
       .signInWithEmailAndPassword(email, password)
       .then(response => {
         submitLoading = false;
+        console.log(response.user);
         dispatch(LoginSuccess(response.user, submitLoading));
+      })
+      .catch(error => {
+        submitLoading = false;
+        console.log(error.message);
+        dispatch(LoginFailure(error.message, submitLoading));
+      });
+  };
+};
+
+export const logOut = () => {
+  let submitLoading = true;
+  return dispatch => {
+    dispatch(logoutRequest(submitLoading));
+    auth()
+      .signOut()
+      .then(() => {
+        submitLoading = false;
+        dispatch(LoginSuccess(submitLoading));
       })
       .catch(error => {
         submitLoading = false;
