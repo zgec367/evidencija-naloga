@@ -66,14 +66,14 @@ const reducer = (state = initialState, action) => {
         submitLoading: action.submitLoading,
       };
     case UPDATE_SERVICE_ORDER_SUCCESS:
-      let quote = action.payload;
-      let quotes = [...state.data]; //clone the current state
-      let index = quotes.findIndex(data => data.Id == quote.Id); //find the index of the quote with the quote id passed
+      let serviceOrder = action.payload;
+      let serviceOrders = [...state.data];
+      let index = serviceOrders.findIndex(data => data.Id == serviceOrder.Id);
       if (index !== -1) {
-        quotes[index] = quote;
+        serviceOrders[index] = serviceOrder;
       }
       state = Object.assign({}, state, {
-        data: quotes,
+        data: serviceOrders,
         successStatus: action.success,
       });
       return state;
@@ -91,7 +91,32 @@ const reducer = (state = initialState, action) => {
         loading: action.loading,
         successStatus: false,
       };
+    case FINISH_SERVICE_ORDER_SUCCESS:
+      let order = action.payload;
+      let orders = [...state.data];
+      let i = orders.findIndex(data => data.Id == order.Id);
+      if (i !== -1) {
+        orders[i] = order;
+      }
+      state = Object.assign({}, state, {
+        data: orders,
+        successStatus: action.success,
+      });
+      return state;
 
+    case FINISH_SERVICE_ORDER_REQUEST:
+      return {
+        ...state,
+        loading: action.loading,
+      };
+    case FINISH_SERVICE_ORDER_FAILURE:
+      return {
+        ...state,
+        errorMsg: action.payload,
+        error: true,
+        loading: action.loading,
+        successStatus: false,
+      };
     default:
       return state;
   }

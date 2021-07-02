@@ -1,11 +1,108 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
-import {View, FlatList, Text, ActivityIndicator} from 'react-native';
-import {FAB, Card, IconButton} from 'react-native-paper';
+import {View, FlatList, Text} from 'react-native';
+import {Card, IconButton} from 'react-native-paper';
+import RNPrint from 'react-native-print';
 import moment from 'moment';
-
 function DoneOrders({navigation, serviceOrders}) {
-  useEffect(() => {}, []);
+  const printPDF = async serviceOrder => {
+    await RNPrint.print({
+      html: `
+    <style>
+    td, th {
+      border: 1px solid black;
+      text-align: left;
+      font-size: 35px;
+      margin:0px;
+    }
+    h2 {
+      font-size:35px;
+      text-align: center;
+    }
+    table{
+      width:100%;
+    }
+    .service{
+      width:80%;
+    }
+   .description{
+     height:100px;
+   }
+   .order-info{
+     font-size:35px;
+     margin-top:100px;
+   }
+   .order-price{
+    font-size:40px;
+    font-weight:500;
+    float:right;
+    margin-top:20px;
+   }
+   .customer-line{
+     margin-top:50px;
+   }
+   .received{
+    margin-top:100px;
+    float:right;
+    font-size:35px;
+   }
+    </style>
+    <h2>Servisni nalog br.: ${moment(serviceOrder.OrderDate).year()}/${
+        serviceOrder.ServiceOrderNumber
+      }</h2>
+    <table>
+    <tr>
+      <td>Kupac:${serviceOrder.Customer.Name}</td>
+      <td>Tel./Mob.:${serviceOrder.Customer.PhoneNumber}</td>
+    </tr>
+    </table>
+    <h2>Za servis:</h2>
+    <table>
+    <tr>
+      <td>Artikl:${serviceOrder.Article}</td>
+      
+    </tr>
+    <tr>
+    <td class="service">Garantni rok:${
+      serviceOrder.WarrantyPeriod ? 'Da' : 'Ne'
+    }</td>
+    </tr>
+    <tr>
+    <td class="service">Podaci bitni:${
+      serviceOrder.EssentialData ? 'Da' : 'Ne'
+    }</td>
+    </tr>
+    </table>
+    <table>
+    <tr class="description">
+    <td>Opis:</td>
+    <td>${serviceOrder.Description}</td>
+    <tr class="description">
+    <td>Izvršene usluge:</td>
+    <td>${serviceOrder.PerformedServicesList.map(service => service)}</td>
+    </tr>
+   
+    </table>
+    <div class="order-price">Ukupna cijena: ${serviceOrder.TotalPrice} HRK</div>
+    <div class="order-info"> <div>Datum i vrijeme naloga: ${
+      moment(serviceOrder.OrderDate).format('DD.MM.yyyy. u ') +
+      serviceOrder.OrderTime
+    }
+    </div>
+    <div class="received"> <div>Zaprimio:</div> <div>${
+      serviceOrder.Received
+    }</div>
+    </div>
+   
+    <div class="order-info">Kupac</div>
+    <div class="customer-line">_______________________</div>
+    
+    </div>
+   
+    `,
+    });
+  };
+
   return (
     <View style={{height: '100%'}}>
       <FlatList
@@ -35,13 +132,7 @@ function DoneOrders({navigation, serviceOrders}) {
             />
             <Text style={{alignSelf: 'flex-end'}}>
               <IconButton
-                icon="pencil"
-                color="#072f3d"
-                onPress={() =>
-                  navigation.navigate('Edit', {serviceOrder: item})
-                }
-              />
-              <IconButton
+                size={30}
                 icon="printer-pos"
                 color="#072f3d"
                 onPress={() => printPDF(item)}

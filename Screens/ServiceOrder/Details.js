@@ -34,8 +34,26 @@ export default function Details({navigation, route}) {
           <Text style={{fontSize: 18, marginTop: 10}}>
             Opis: {route.params.serviceOrder.Description}
           </Text>
-
-          <Text style={{fontSize: 18, marginTop: 50, textAlign: 'right'}}>
+          {route.params.serviceOrder.PerformedServicesList.length ? (
+            <Text style={{fontSize: 18, marginTop: 10}}>
+              Izvršene usluge:{'\n'}
+              {route.params.serviceOrder.PerformedServicesList.map(
+                service => '- ' + service + '\n',
+              )}
+            </Text>
+          ) : null}
+          {route.params.serviceOrder.TotalPrice ? (
+            <Text
+              style={{
+                fontSize: 18,
+                marginTop: 20,
+                fontWeight: '700',
+                textAlign: 'right',
+              }}>
+              Ukupna cijena: {route.params.serviceOrder.TotalPrice} HRK
+            </Text>
+          ) : null}
+          <Text style={{fontSize: 18, marginTop: 40, textAlign: 'right'}}>
             Zaprimio: {route.params.serviceOrder.Received} u{' '}
             {route.params.serviceOrder.OrderTime}
           </Text>

@@ -1,7 +1,8 @@
 import firestore, {firebase} from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {createContext} from 'react';
-import {ToastAndroid} from 'react-native';
+import {ToastAndroid, Alert} from 'react-native';
+import RNPrint from 'react-native-print';
 import moment from 'moment';
 
 export const Context = createContext();
@@ -100,6 +101,35 @@ export const editServiceOrderFailure = (error, submitLoading) => {
   };
 };
 
+///
+export const finishServiceOrderRequest = submitLoading => {
+  return {
+    type: FINISH_SERVICE_ORDER_REQUEST,
+    payload: submitLoading,
+  };
+};
+
+export const finishServiceOrderSuccess = (
+  submitLoading,
+  successStatus,
+  data,
+) => {
+  return {
+    type: FINISH_SERVICE_ORDER_SUCCESS,
+    payload: data,
+    submitLoading: submitLoading,
+    success: successStatus,
+  };
+};
+
+export const finishServiceOrderFailure = (error, submitLoading) => {
+  return {
+    type: FINISH_SERVICE_ORDER_FAILURE,
+    payload: error,
+    submitLoading: submitLoading,
+  };
+};
+
 export const printServiceOrderRequest = loading => {
   return {
     type: PRINT_SERVICE_ORDER_REQUEST,
@@ -182,8 +212,6 @@ export const addServiceOrder = (serviceOrder, navigation) => {
                 serviceOrder.Photo = downloadUrl;
                 snapshot.set(serviceOrder);
                 dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
-
-                navigation.goBack();
                 ToastAndroid.showWithGravityAndOffset(
                   'Uspješno ste dodali servisni nalog',
                   ToastAndroid.SHORT,
@@ -191,6 +219,8 @@ export const addServiceOrder = (serviceOrder, navigation) => {
                   0,
                   100,
                 );
+                navigation.goBack();
+                printPDF(serviceOrder);
               });
             },
           );
@@ -198,7 +228,15 @@ export const addServiceOrder = (serviceOrder, navigation) => {
           submitLoading = false;
           snapshot.set(serviceOrder);
           dispatch(addServiceOrderSuccess(serviceOrder, submitLoading));
+          ToastAndroid.showWithGravityAndOffset(
+            'Uspješno ste dodali servisni nalog',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            0,
+            100,
+          );
           navigation.goBack();
+          printPDF(serviceOrder);
         }
       })
       .catch(error => {
@@ -255,6 +293,7 @@ export const editServiceOrder = (serviceOrder, navigation) => {
         EssentialData: serviceOrder.EssentialData,
         PerformedServicesList: serviceOrder.PerformedServicesList,
         TotalPrice: serviceOrder.TotalPrice,
+        Done: serviceOrder.Done,
       })
       .then(() => {
         submitLoading = false;
@@ -269,7 +308,6 @@ export const editServiceOrder = (serviceOrder, navigation) => {
         dispatch(
           editServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
         );
-
         navigation.goBack();
       })
 
@@ -278,4 +316,270 @@ export const editServiceOrder = (serviceOrder, navigation) => {
         dispatch(editServiceOrderFailure(submitLoading));
       });
   };
+};
+
+///////////
+export const finishServiceOrder = (serviceOrder, navigation) => {
+  let submitLoading = true;
+  return dispatch => {
+    dispatch(finishServiceOrderRequest(submitLoading));
+    firestore()
+      .collection('ServiceOrders')
+      .doc(serviceOrder.Id)
+      .update({
+        PerformedServicesList: serviceOrder.PerformedServicesList,
+        TotalPrice: serviceOrder.TotalPrice,
+        Done: serviceOrder.Done,
+      })
+      .then(() => {
+        submitLoading = false;
+        let successStatus = true;
+        dispatch(
+          finishServiceOrderSuccess(submitLoading, successStatus, serviceOrder),
+        );
+        ToastAndroid.showWithGravityAndOffset(
+          'Uspješno ste izvršili servisni nalog',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          0,
+          100,
+        );
+        navigation.goBack();
+        Alert.alert(
+          'Printanje naloga',
+          'Želite li isprintati izvršeni nalog?',
+          [
+            {
+              text: 'Odustani',
+              onPress: () => {
+                ToastAndroid.showWithGravityAndOffset(
+                  'Uspješno ste izvršili servisni nalog',
+                  ToastAndroid.SHORT,
+                  ToastAndroid.BOTTOM,
+                  0,
+                  100,
+                );
+                navigation.goBack();
+              },
+              style: 'cancel',
+            },
+            {
+              text: 'Printaj',
+              onPress: () => {
+                RNPrint.print({
+                  html: `
+                <style>
+                td, th {
+                  border: 1px solid black;
+                  text-align: left;
+                  font-size: 35px;
+                  margin:0px;
+                }
+                h2 {
+                  font-size:35px;
+                  text-align: center;
+                }
+                table{
+                  width:100%;
+                }
+                .service{
+                  width:80%;
+                }
+               .description{
+                 height:100px;
+               }
+               .order-info{
+                 font-size:35px;
+                 margin-top:100px;
+               }
+               .order-price{
+                font-size:40px;
+                font-weight:500;
+                float:right;
+                margin-top:20px;
+               }
+               .customer-line{
+                 margin-top:50px;
+               }
+               .received{
+                margin-top:100px;
+                float:right;
+                font-size:35px;
+               }
+                </style>
+                <h2>Servisni nalog br.: ${moment(
+                  serviceOrder.OrderDate,
+                ).year()}/${serviceOrder.ServiceOrderNumber}</h2>
+                <table>
+                <tr>
+                  <td>Kupac:${serviceOrder.Customer.Name}</td>
+                  <td>Tel./Mob.:${serviceOrder.Customer.PhoneNumber}</td>
+                </tr>
+                </table>
+                <h2>Za servis:</h2>
+                <table>
+                <tr>
+                  <td>Artikl:${serviceOrder.Article}</td>
+                  
+                </tr>
+                <tr>
+                <td class="service">Garantni rok:${
+                  serviceOrder.WarrantyPeriod ? 'Da' : 'Ne'
+                }</td>
+                </tr>
+                <tr>
+                <td class="service">Podaci bitni:${
+                  serviceOrder.EssentialData ? 'Da' : 'Ne'
+                }</td>
+                </tr>
+                </table>
+                <table>
+                <tr class="description">
+                <td>Opis:</td>
+                <td>${serviceOrder.Description}</td>
+                <tr class="description">
+                <td>Izvršene usluge:</td>
+                <td>${serviceOrder.PerformedServicesList.map(
+                  service => service,
+                )}</td>
+                </tr>
+               
+                </table>
+                <div class="order-price">Ukupna cijena: ${
+                  serviceOrder.TotalPrice
+                } HRK</div>
+                <div class="order-info"> <div>Datum i vrijeme naloga: ${
+                  moment(serviceOrder.OrderDate).format('DD.MM.yyyy. u ') +
+                  serviceOrder.OrderTime
+                }
+                </div>
+                <div class="received"> <div>Zaprimio:</div> <div>${
+                  serviceOrder.Received
+                }</div>
+                </div>
+               
+                <div class="order-info">Kupac</div>
+                <div class="customer-line">_______________________</div>
+                
+                </div>
+               
+                `,
+                });
+              },
+            },
+          ],
+          {cancelable: false},
+        );
+      })
+      .catch(error => {
+        submitLoading = false;
+        dispatch(finishServiceOrderFailure(submitLoading));
+      });
+  };
+};
+
+const printPDF = async serviceOrder => {
+  Alert.alert(
+    'Printanje naloga',
+    'Želite li isprintati kreirani nalog?',
+    [
+      {
+        text: 'Odustani',
+        style: 'cancel',
+      },
+      {
+        text: 'Printaj',
+        onPress: () => {
+          RNPrint.print({
+            html: `
+                <style>
+                td, th {
+                  border: 1px solid black;
+                  text-align: left;
+                  font-size: 35px;
+                  margin:0px;
+                }
+                h2 {
+                  font-size:35px;
+                  text-align: center;
+                }
+                table{
+                  width:100%;
+                }
+                .service{
+                  width:80%;
+                }
+              .description{
+                height:100px;
+              }
+              .order-info{
+                font-size:35px;
+                margin-top:100px;
+              }
+              .order-price{
+                font-size:40px;
+                font-weight:500;
+                float:right;
+                margin-top:20px;
+              }
+              .customer-line{
+                margin-top:50px;
+              }
+              .received{
+                margin-top:100px;
+                float:right;
+                font-size:35px;
+              }
+                </style>
+                <h2>Servisni nalog br.: ${moment(
+                  serviceOrder.OrderDate,
+                ).year()}/${serviceOrder.ServiceOrderNumber}</h2>
+                <table>
+                <tr>
+                  <td>Kupac:${serviceOrder.Customer.Name}</td>
+                  <td>Tel./Mob.:${serviceOrder.Customer.PhoneNumber}</td>
+                </tr>
+                </table>
+                <h2>Za servis:</h2>
+                <table>
+                <tr>
+                  <td>Artikl:${serviceOrder.Article}</td>
+                  
+                </tr>
+                <tr>
+                <td class="service">Garantni rok:${
+                  serviceOrder.WarrantyPeriod ? 'Da' : 'Ne'
+                }</td>
+                </tr>
+                <tr>
+                <td class="service">Podaci bitni:${
+                  serviceOrder.EssentialData ? 'Da' : 'Ne'
+                }</td>
+                </tr>
+                </table>
+                <table>
+                <tr class="description">
+                <td>Opis:</td>
+                <td>${serviceOrder.Description}</td>                          
+                </tr>                      
+                </table>                      
+                <div class="order-info"> <div>Datum i vrijeme naloga: ${
+                  moment(serviceOrder.OrderDate).format('DD.MM.yyyy. u ') +
+                  serviceOrder.OrderTime
+                }
+                </div>
+                <div class="received"> <div>Zaprimio:</div> <div>${
+                  serviceOrder.Received
+                }</div>
+                </div>                      
+                <div class="order-info">Kupac</div>
+                <div class="customer-line">_______________________</div>                        
+                </div>                      
+            `,
+          });
+        },
+      },
+    ],
+    {cancelable: false},
+  );
 };

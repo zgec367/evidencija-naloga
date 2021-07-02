@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Context} from '../Components/FirebaseProvider';
 import auth from '@react-native-firebase/auth';
-import {Dimensions, Text, View} from 'react-native';
+import {Dimensions, Text, View, Alert} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../Screens/Home';
 import Login from '../Screens/Login';
@@ -101,7 +101,25 @@ function MainNavigation({logOut}) {
                     </Button>
                     <Button
                       style={{marginTop: 150}}
-                      onPress={() => logOut()}
+                      onPress={() => {
+                        Alert.alert(
+                          'Odjava',
+                          'Jeste li sigurni da se želite odjaviti?',
+                          [
+                            {
+                              text: 'Odustani',
+                              style: 'cancel',
+                            },
+                            {
+                              text: 'Odjava',
+                              onPress: () => {
+                                setVisible(false);
+                                logOut();
+                              },
+                            },
+                          ],
+                        );
+                      }}
                       labelStyle={{
                         fontSize: 15,
                         color: '#072f3d',
@@ -201,7 +219,7 @@ function MainNavigation({logOut}) {
           name="FinishedOrders"
           component={DoneOrders}
           options={{
-            title: 'Izvšeni nalozi',
+            title: 'Izvršeni nalozi',
             headerTintColor: 'white',
             headerTitleStyle: {
               fontSize: 25,

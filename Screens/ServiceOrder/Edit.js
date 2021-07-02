@@ -11,9 +11,11 @@ import {
   Chip,
 } from 'react-native-paper';
 import {editServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
+import {finishServiceOrder} from '../../Redux/ServiceOrder/ServiceOrderActions';
+
 import {connect} from 'react-redux';
 
-function Edit({navigation, route, editServiceOrder}) {
+function Edit({navigation, route, editServiceOrder, finishServiceOrder}) {
   const [loading, setLoading] = useState(false);
   const [finishOrder, setFinishedOrder] = useState(false);
 
@@ -30,11 +32,10 @@ function Edit({navigation, route, editServiceOrder}) {
   const [essentialData, setEssentialData] = useState(
     route.params.serviceOrder.EssentialData,
   );
-  console.log(
-    '33 linija edit..' + route.params.serviceOrder.PerformedServicesList,
-  );
+
   const validationSchema = Yup.object().shape({
     PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
+    TotalPrice: Yup.string().matches('^[0-9]+$', 'Unesite ispravnu cijenu'),
     Article: Yup.string().required('Ovo je polje obavezno'),
     Name: Yup.string().required('Ovo je polje obavezno'),
     PhoneNumber: Yup.string().required('Ovo je polje obavezno'),
@@ -265,6 +266,7 @@ function Edit({navigation, route, editServiceOrder}) {
                           label="Cijena usluge"
                           placeholder="Unesite cijenu"
                           value={values.TotalPrice}
+                          keyboardType="numeric"
                           left={
                             <TextInput.Affix
                               text="HRK"
@@ -272,6 +274,11 @@ function Edit({navigation, route, editServiceOrder}) {
                             />
                           }
                         />
+                        {errors.TotalPrice && (
+                          <Text style={{color: 'red', marginLeft: 10}}>
+                            {errors.TotalPrice}
+                          </Text>
+                        )}
                       </View>
 
                       <View
@@ -304,8 +311,20 @@ function Edit({navigation, route, editServiceOrder}) {
                       mode="contained"
                       onPress={() => {
                         if (values.TotalPrice && performedServicesList.length) {
-                          setFinishedOrder(true);
-                          handleSubmit();
+                          serviceOrder.Customer = {
+                            Name: values.Name,
+                            PhoneNumber: values.PhoneNumber,
+                          };
+
+                          serviceOrder.Article = values.Article;
+                          serviceOrder.Description = values.Description;
+                          serviceOrder.WarrantyPeriod = warrantyPeriod;
+                          serviceOrder.EssentialData = essentialData;
+                          serviceOrder.PerformedServicesList =
+                            performedServicesList;
+                          serviceOrder.TotalPrice = values.TotalPrice;
+                          serviceOrder.Done = true;
+                          finishServiceOrder(serviceOrder, navigation);
                         } else {
                           alert(
                             'Niste unijeli cijenu i usluge servisnog naloga',
@@ -343,6 +362,7 @@ function Edit({navigation, route, editServiceOrder}) {
 
 const mapDispatchToProps = {
   editServiceOrder,
+  finishServiceOrder,
 };
 
 export default connect(null, mapDispatchToProps)(Edit);

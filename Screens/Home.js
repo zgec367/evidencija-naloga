@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import RNPrint from 'react-native-print';
 import {View, FlatList, Text, ActivityIndicator, Image} from 'react-native';
 import {FAB, Card, IconButton} from 'react-native-paper';
 import moment from 'moment';
@@ -13,87 +12,6 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
     }
   }, []);
 
-  const printPDF = async item => {
-    await RNPrint.print({
-      html: `
-      <style>
-      td, th {
-        border: 1px solid black;
-        text-align: left;
-        font-size: 35px;
-        margin:0px;
-      }
-      h2 {
-        font-size:35px;
-        text-align: center;
-      }
-      table{
-        width:100%;
-      }
-      .service{
-        width:80%;
-      }
-     .description{
-       height:100px;
-     }
-     .order-info{
-       font-size:35px;
-       margin-top:100px;
-     }
-     .customer-line{
-       margin-top:50px;
-     }
-     .received{
-      margin-top:100px;
-      float:right;
-      font-size:35px;
-     }
-      </style>
-      <h2>Servisni nalog br.: ${moment(item.OrderDate).year()}/${
-        item.ServiceOrderNumber
-      }</h2>
-      <table>
-      <tr>
-        <td>Kupac:${item.Customer.Name}</td>
-        <td>Tel./Mob.:${item.Customer.PhoneNumber}</td>
-      </tr>
-      </table>
-      <h2>Za servis:</h2>
-      <table>
-      <tr>
-        <td>Artikl:${item.Article}</td>
-        
-      </tr>
-      <tr>
-      <td class="service">Garantni rok:${item.WarrantyPeriod ? 'Da' : 'Ne'}</td>
-      </tr>
-      <tr>
-      <td class="service">Podaci bitni:${item.EssentialData ? 'Da' : 'Ne'}</td>
-      </tr>
-      </table>
-      <table>
-      <tr class="description">
-      <td>Opis:</td>
-      <td>${item.Description}</td>
-      </tr>
-     
-      </table>
-
-      <div class="order-info"> <div>Datum i vrijeme naloga: ${
-        moment(item.OrderDate).format('DD.MM.yyyy. u ') + item.OrderTime
-      }
-      </div>
-      <div class="received"> <div>Zaprimio:</div> <div>${item.Received}</div>
-      </div>
-     
-      <div class="order-info">Kupac</div>
-      <div class="customer-line">_______________________</div>
-      
-      </div>
-     
-      `,
-    });
-  };
   return (
     <View style={{height: '100%', alignItems: 'center'}}>
       {!serviceOrders.loadingData ? (
@@ -126,18 +44,12 @@ function Home({navigation, serviceOrders, fetchInProgressOrder}) {
                 right={() => (
                   <Text style={{alignSelf: 'flex-end'}}>
                     <IconButton
-                      size={30}
+                      size={40}
                       icon="pencil"
                       color="#072f3d"
                       onPress={() =>
                         navigation.navigate('Edit', {serviceOrder: item})
                       }
-                    />
-                    <IconButton
-                      size={30}
-                      icon="printer-pos"
-                      color="#072f3d"
-                      onPress={() => printPDF(item)}
                     />
                   </Text>
                 )}
