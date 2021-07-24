@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {FirebaseProvider} from './Components/FirebaseProvider';
 import MainNavigation from './Navigation/MainNavigation';

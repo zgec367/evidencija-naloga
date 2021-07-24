@@ -32,7 +32,7 @@ export const LoginSuccess = (data, submitLoading) => {
 
 export const LoginFailure = (error, submitLoading) => {
   return {
-    type: EMPLOYEE_LOGOUT_FAILURE,
+    type: EMPLOYEE_LOGIN_FAILURE,
     payload: error,
     submitLoading: submitLoading,
   };
@@ -108,7 +108,6 @@ export const login = (email, password) => {
       .signInWithEmailAndPassword(email, password)
       .then(response => {
         submitLoading = false;
-        console.log(response.user);
         dispatch(LoginSuccess(response.user, submitLoading));
       })
       .catch(error => {
@@ -127,11 +126,11 @@ export const logOut = () => {
       .signOut()
       .then(() => {
         submitLoading = false;
-        dispatch(LoginSuccess(submitLoading));
+        dispatch(logoutSuccess(submitLoading));
       })
       .catch(error => {
         submitLoading = false;
-        dispatch(LoginFailure(error.message, submitLoading));
+        dispatch(logoutFailure(error.message, submitLoading));
       });
   };
 };

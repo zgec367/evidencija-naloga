@@ -12,7 +12,6 @@ import {
 
 const initialState = {
   employees: [],
-  employee: {},
   submitLoading: false,
   errorMsg: '',
 };

@@ -8,17 +8,10 @@ export const FirebaseProvider = ({children}) => {
   const [user, setUser] = useState(null);
 
   return (
-    <Context.Provider
+    <Context.Provider //sluzi za spremanje vrijednosti varijable koja će se mijenjati tokom aplikacije
       value={{
         user,
         setUser,
-        logOut: async () => {
-          await auth()
-            .signOut()
-            .catch(error => {
-              console.log(error);
-            });
-        },
       }}>
       {children}
     </Context.Provider>

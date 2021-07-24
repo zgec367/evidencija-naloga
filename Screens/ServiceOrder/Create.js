@@ -37,8 +37,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
     Name: Yup.string().required('Ovo je polje obavezno'),
     PhoneNumber: Yup.string()
       .required('Ovo je polje obavezno')
-      .matches('^[0-9]+$', 'Neispravan broj')
-      .length(10, 'Kontakt broj mora sadržavati 10 brojeva'),
+      .matches('^[0-9]+$', 'Neispravan broj'),
     Description: Yup.string().required('Ovo je polje obavezno'),
   });
 
@@ -227,15 +226,17 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       onPress={() =>
                         launchCamera(
                           {
-                            quality: 0.2,
-                            maxHeight: 250,
-                            maxWidth: 350,
-                            includeBase64: true,
+                            quality: 0.1,
+                            maxHeight: 200,
+                            maxWidth: 300,
+                            includeBase64: false,
                           },
+
                           result => {
-                            console.log('kamera pokrenuta');
-                            result.assets.map(data => setPhoto(data.uri));
-                            console.log(photo);
+                            if (!result.didCancel) {
+                              result.assets.map(data => setPhoto(data.uri));
+                              console.log(photo);
+                            }
                           },
                         )
                       }
@@ -260,8 +261,9 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                       color="#87cefa"
                       onPress={() =>
                         launchCamera({quality: 0.2}, result => {
-                          console.log('kamera pokrenuta');
-                          result.assets.map(data => setPhoto(data.uri));
+                          if (!result.didCancel) {
+                            result.assets.map(data => setPhoto(data.uri));
+                          }
                         })
                       }
                     />
@@ -271,7 +273,7 @@ function Create({navigation, route, addServiceOrder, serviceOrders}) {
                     disabled={serviceOrders.submitLoading}
                     style={{
                       marginTop: 40,
-                      width: '50%',
+                      width: '60%',
                       alignSelf: 'center',
                     }}
                     uppercase={false}

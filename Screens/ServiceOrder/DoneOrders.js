@@ -147,12 +147,12 @@ function DoneOrders({navigation, serviceOrders}) {
                 {'Kontakt: ' + item.Customer.PhoneNumber}
               </Text>
             </Card.Content>
-            {item.Photo && (
+            {item.Photo ? (
               <Card.Cover
                 source={{uri: item.Photo}}
                 style={{resizeMode: 'contain'}}
               />
-            )}
+            ) : null}
           </Card>
         )}
       />
@@ -160,7 +160,6 @@ function DoneOrders({navigation, serviceOrders}) {
   );
 }
 const mapStateToProps = state => {
-  console.log('.----------------------------------------------QQQQQ');
   console.log(state.serviceOrdersData);
 
   return {

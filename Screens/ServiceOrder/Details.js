@@ -34,7 +34,7 @@ export default function Details({navigation, route}) {
           <Text style={{fontSize: 18, marginTop: 10}}>
             Opis: {route.params.serviceOrder.Description}
           </Text>
-          {route.params.serviceOrder.PerformedServicesList.length ? (
+          {route.params.serviceOrder.PerformedServicesList ? (
             <Text style={{fontSize: 18, marginTop: 10}}>
               Izvršene usluge:{'\n'}
               {route.params.serviceOrder.PerformedServicesList.map(
@@ -58,25 +58,27 @@ export default function Details({navigation, route}) {
             {route.params.serviceOrder.OrderTime}
           </Text>
         </View>
-        <View
-          style={{
-            width: '90%',
-            height: 200,
-            alignSelf: 'center',
-            marginTop: 40,
-          }}>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('PhotoPreview', {
-                photo: route.params.serviceOrder.Photo,
-              })
-            }>
-            <Image
-              style={{width: '100%', height: '100%'}}
-              source={{uri: route.params.serviceOrder.Photo}}
-            />
-          </TouchableOpacity>
-        </View>
+        {route.params.serviceOrder.Photo ? (
+          <View
+            style={{
+              width: '90%',
+              height: 200,
+              alignSelf: 'center',
+              marginTop: 40,
+            }}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('PhotoPreview', {
+                  photo: route.params.serviceOrder.Photo,
+                })
+              }>
+              <Image
+                style={{width: '100%', height: '100%'}}
+                source={{uri: route.params.serviceOrder.Photo}}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
     </ScrollView>
   );

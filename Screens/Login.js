@@ -83,7 +83,7 @@ function Login({employees, fetchEmployees, login}) {
       ) : (
         <View>
           <Text style={{fontSize: 20, marginTop: 10}}>
-            Ucitavanje zaposlenika...
+            Učitavanje zaposlenika...
           </Text>
 
           <ActivityIndicator
@@ -146,7 +146,6 @@ function Login({employees, fetchEmployees, login}) {
                   Netočna lozinka
                 </Text>
               )}
-
               <Button
                 loading={employees.submitLoading}
                 disabled={employees.submitLoading}
@@ -172,7 +171,7 @@ function Login({employees, fetchEmployees, login}) {
   );
 }
 const mapStateToProps = state => {
-  console.log(state.employeesData.submitLoading);
+  console.log(state.employeesData, 'podaci');
   return {
     employees: state.employeesData,
   };

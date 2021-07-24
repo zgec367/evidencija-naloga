@@ -2,11 +2,12 @@ import React, {useContext, useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Context} from '../Components/FirebaseProvider';
 import auth from '@react-native-firebase/auth';
-import {Dimensions, Text, View, Alert} from 'react-native';
+import {Dimensions, Text, View, Alert, N} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../Screens/Home';
 import Login from '../Screens/Login';
 import {connect} from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
 
 import {IconButton, Menu, Button} from 'react-native-paper';
 import Create from '../Screens/ServiceOrder/Create';
@@ -16,28 +17,39 @@ import Edit from '../Screens/ServiceOrder/Edit';
 import StartLogo from '../Screens/StartLogo';
 import DoneOrders from '../Screens/ServiceOrder/DoneOrders';
 import {logOut} from '../Redux/Employee/EmployeeActions';
+import NoInternetConnection from '../Screens/NoInternetConnection';
 function MainNavigation({logOut}) {
-  const Stack = createStackNavigator();
-  const {user, setUser} = useContext(Context);
-  const [initializing, setInitializing] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const Stack = createStackNavigator(); //za kreiranje stoga, odnosno za navigaciju u aplikaciji, kad se ide kroz razne screenove
+  const {user, setUser} = useContext(Context); //ulogiranje odlogiranje, sluzi za spremanje vrijednosti varijable koja će se mijenjati tokom aplikacije
+  const [initLoggedUserFirebaseAuth, setInitLoggedUserFirebaseAuth] =
+    useState(true); //kao loading za usera, on je na pocetku true, ako dohvati usera je false
+  const [startLogoLoading, setStartLogoLoading] = useState(true);
+  const [internetConnection, setInternetConnection] = useState();
 
-  const [visible, setVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
   const onAuthStateChanged = user => {
     setUser(user);
-    if (initializing) setInitializing(false);
+    if (initLoggedUserFirebaseAuth) setInitLoggedUserFirebaseAuth(false); //ako user postoji ili ne postoji
   };
-  const toStartLogo = async () => {
-    setLoading(false);
+  const onStartLogoTimerFinished = async () => {
+    setStartLogoLoading(false);
   };
+
   useEffect(() => {
-    setTimeout(toStartLogo, 2000);
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    setTimeout(onStartLogoTimerFinished, 2000);
+
+    const internetConnectionSubscribe = NetInfo.addEventListener(state => {
+      setInternetConnection(state.isConnected);
+    });
+    const firebaseLoginLogoutSubscriber =
+      auth().onAuthStateChanged(onAuthStateChanged);
+    return firebaseLoginLogoutSubscriber, internetConnectionSubscribe; // unsubscribe on unmount
   }, []);
 
-  if (initializing) return null;
-  if (loading) return <StartLogo />;
+  if (initLoggedUserFirebaseAuth) return null;
+  if (startLogoLoading) return <StartLogo />;
+  if (!internetConnection) return <NoInternetConnection />;
+
   return (
     <NavigationContainer theme={{colors: {background: 'white'}}}>
       <Stack.Navigator initialRouteName="Home" mode="modal">
@@ -48,20 +60,21 @@ function MainNavigation({logOut}) {
             options={({navigation}) => ({
               headerLeft: () => (
                 <Menu
-                  visible={visible}
+                  visible={menuVisible}
                   statusBarHeight={48}
                   style={{marginLeft: 8}}
                   contentStyle={{
-                    height: '70%',
+                    height: '110%',
                     width: Dimensions.get('window').width - 150,
                   }}
-                  onDismiss={() => setVisible(false)}
+                  onDismiss={() => setMenuVisible(false)} //za klik negdje u app, makne menu...
                   anchor={
+                    //3 crtice - menu button
                     <IconButton
                       size={40}
                       color="white"
                       icon="menu"
-                      onPress={() => setVisible(true)}
+                      onPress={() => setMenuVisible(true)}
                     />
                   }>
                   <Text style={{margin: 10, fontSize: 20, color: '#072f3d'}}>
@@ -71,27 +84,17 @@ function MainNavigation({logOut}) {
                     style={{
                       width: '90%',
 
-                      height: Dimensions.get('window').height,
+                      height: '100%',
                       alignSelf: 'center',
                       marginTop: 50,
                     }}>
                     <Button
                       uppercase={false}
-                      onPress={() => console.log('opa')}
-                      labelStyle={{
-                        fontSize: 15,
-                        color: 'white',
-                      }}
-                      mode="contained">
-                      Profil
-                    </Button>
-                    <Button
-                      uppercase={false}
                       onPress={() => {
-                        setVisible(false);
+                        setMenuVisible(false);
                         navigation.navigate('FinishedOrders');
                       }}
-                      style={{marginTop: 20}}
+                      style={{marginTop: 5}}
                       labelStyle={{
                         color: 'white',
                         fontSize: 15,
@@ -99,8 +102,9 @@ function MainNavigation({logOut}) {
                       mode="contained">
                       Izvršeni nalozi
                     </Button>
+
                     <Button
-                      style={{marginTop: 150}}
+                      style={{marginTop: 40}}
                       onPress={() => {
                         Alert.alert(
                           'Odjava',
@@ -113,7 +117,7 @@ function MainNavigation({logOut}) {
                             {
                               text: 'Odjava',
                               onPress: () => {
-                                setVisible(false);
+                                setMenuVisible(false);
                                 logOut();
                               },
                             },
@@ -235,7 +239,10 @@ function MainNavigation({logOut}) {
 }
 
 const mapDispatchToProps = {
+  //iz reduxa, dohvaca se funkcija iz reduxa
   logOut,
 };
 
 export default connect(null, mapDispatchToProps)(MainNavigation);
+//export default - exportam trenutnu komponentu da bude dostupna u drugoj komponenti
+//connect - povezujem redux funkcije i stateove sa trenutnom komponentom

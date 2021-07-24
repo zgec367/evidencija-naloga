@@ -19,13 +19,11 @@ import {
   TAKE_PHOTO_FAILURE,
   PRINT_SERVICE_ORDER_REQUEST,
   PRINT_SERVICE_ORDER_SUCCESS,
-  FPRINT_SERVICE_ORDER_FAILURE,
+  PRINT_SERVICE_ORDER_FAILURE,
 } from '../ServiceOrder/ServiceOrderTypes';
-
 const initialState = {
   data: [],
 };
-
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_IN_PROGRESS_SERVICE_ORDERS_REQUEST:
@@ -70,6 +68,7 @@ const reducer = (state = initialState, action) => {
       let serviceOrders = [...state.data];
       let index = serviceOrders.findIndex(data => data.Id == serviceOrder.Id);
       if (index !== -1) {
+        //ako on - nalog- postoji u listi, onda je taj servisni nalog jednak ažuriranom nalogu
         serviceOrders[index] = serviceOrder;
       }
       state = Object.assign({}, state, {
@@ -103,7 +102,6 @@ const reducer = (state = initialState, action) => {
         successStatus: action.success,
       });
       return state;
-
     case FINISH_SERVICE_ORDER_REQUEST:
       return {
         ...state,
@@ -117,9 +115,28 @@ const reducer = (state = initialState, action) => {
         loading: action.loading,
         successStatus: false,
       };
+
+    case PRINT_SERVICE_ORDER_REQUEST:
+      return {
+        ...state,
+        loading: action.payload,
+      };
+
+    case PRINT_SERVICE_ORDER_SUCCESS:
+      return {
+        ...state,
+        loading: action.payload,
+      };
+
+    case PRINT_SERVICE_ORDER_FAILURE:
+      return {
+        ...state,
+        loading: action.loading,
+        errorMsg: action.payload,
+      };
+
     default:
       return state;
   }
 };
-
 export default reducer;
